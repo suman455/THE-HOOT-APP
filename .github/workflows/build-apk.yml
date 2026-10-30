@@ -3,7 +3,8 @@ name: Build THE HOOT APK
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   build:
@@ -19,13 +20,14 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android SDK packages
+      - name: Install Android SDK
         run: |
-          yes | sdkmanager --licenses
-          sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          export ANDROID_HOME=/usr/local/lib/android/sdk
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/16.0/bin/sdkmanager"
+          yes | "$SDKMANAGER" --licenses
+          "$SDKMANAGER" --install "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
